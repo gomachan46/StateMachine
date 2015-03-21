@@ -3,6 +3,8 @@ StateMachine
 
 StateMachine is a simple state machine with annotations for PHP, inspired by AASM known as a Ruby state machine.
 
+[![Build Status](https://travis-ci.org/gomachan46/StateMachine.svg?branch=master)](https://travis-ci.org/gomachan46/StateMachine)
+
 ## Description
 
 StateMachine is ... ?
