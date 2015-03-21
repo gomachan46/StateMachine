@@ -115,7 +115,7 @@ trait StateMachineTrait
         $reader = new AnnotationReader();
         $this->stateMachineAnnotationsSM = $reader->getClassAnnotation(
             new \ReflectionClass($this),
-            StateMachine::class
+            'StateMachine\Annotations\StateMachine'
         );
         if (!$this->stateMachineAnnotationsSM) {
             throw new NotFoundAnnotationException('Not found @StateMachine annotation to class');
