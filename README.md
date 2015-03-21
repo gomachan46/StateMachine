@@ -34,7 +34,7 @@ Job's initial state is `sleeping`.
 
 This case, you can use StateMachine, only this.
 
-```
+```php
 use StateMachine\Annotations as SM;
 use StateMachine\Traits\StateMachineTrait;
 
@@ -123,7 +123,7 @@ StateMachine works with PHP 5.4.0 or later.
 
 Adding a state machine is as simple as:
 
-```
+```php
 use StateMachine\Annotations as SM;
 use StateMachine\Traits\StateMachineTrait;
 
@@ -144,7 +144,7 @@ and start defining states and events together with their transitions.
 
 ### Basic Setting
 
-```
+```php
 ## use StateMachine;
 use StateMachine\Annotations as SM;
 use StateMachine\Traits\StateMachineTrait;
@@ -240,7 +240,7 @@ class Job
 
 StateMachine provides some methods.
 
-```
+```php
 $job = new Job();
 $job->isSleeping(); // true
 $job->canRun(); // true
@@ -255,7 +255,7 @@ $job->run(); // raises StateMachine\Exceptions\InvalidTransitionException
 
 StateMachine support direct assign.
 
-```
+```php
 $job = new Job();
 $job->getStatus(); // 'sleeping'
 $job->setStatus('running'); // return $job
