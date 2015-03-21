@@ -1,0 +1,41 @@
+{
+    "name": "gomachan46/state-machine",
+    "description": "simple state machine with annotations for PHP, inspired by AASM known as a Ruby state machine.",
+    "keywords": [
+        "statemachine",
+        "workflow",
+        "state",
+        "status",
+        "annotation",
+        "doctrine2",
+        "event",
+        "transition",
+        "symfony",
+        "bundle",
+        "SM",
+        "trait",
+        "finite",
+        "aasm"
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/inflector": "~1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Go Nakanishi",
+            "email": "shiro.gomachan46@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src/",
+            "StateMachine\\Tests\\": "tests/"
+        }
+    }
+}
