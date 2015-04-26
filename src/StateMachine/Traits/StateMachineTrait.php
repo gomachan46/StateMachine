@@ -143,6 +143,7 @@ trait StateMachineTrait
 
     /**
      * @param $event
+     * @return bool
      */
     private function addEventExecuteMethodSM($event)
     {
@@ -162,11 +163,15 @@ trait StateMachineTrait
                 }
                 $this->setEntityStatusSM($transition->to);
 
-                return;
+                return true;
             }
-            throw new InvalidTransitionException(
-                sprintf('Invalid transition. event: %s, from: %s', $event->name, $this->getEntityStatusSM())
-            );
+            if ($this->stateMachineAnnotationsSM->whinyTransitions) {
+                return false;
+            } else {
+                throw new InvalidTransitionException(
+                    sprintf('Invalid transition. event: %s, from: %s', $event->name, $this->getEntityStatusSM())
+                );
+            }
         };
         $this->methodsSM[$methodName] = $cb;
     }

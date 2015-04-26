@@ -43,6 +43,11 @@ class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('running', $this->job->getStatus());
     }
 
+    public function testTransitionEventMethodReturnTrue()
+    {
+        $this->assertTrue($this->job->run());
+    }
+
     /**
      * @dataProvider invalidTransitionEventMethods
      */
