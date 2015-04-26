@@ -5,7 +5,6 @@ namespace StateMachine\Traits;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
-use StateMachine\Annotations\StateMachine;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Exceptions\NotFoundAnnotationException;
