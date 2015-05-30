@@ -4,10 +4,12 @@ namespace StateMachine\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
+use StateMachine\Annotations\State;
 use StateMachine\Annotations\StateMachine;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Exceptions\NotFoundAnnotationException;
+use StateMachine\Exceptions\NotFoundStateException;
 
 /**
  * Trait StateMachineTrait
@@ -161,6 +163,8 @@ trait StateMachineTrait
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
+                $toState = $this->findStateByNameSM($transition->to);
+                $this->executeEntityMethod($toState->beforeEnter);
                 $this->setEntityStatusSM($transition->to);
 
                 return true;
@@ -279,5 +283,41 @@ trait StateMachineTrait
                 sprintf('Invalid "from" value. There must be an array or string. from: %s', $from)
             );
         }
+    }
+
+    /**
+     * @param $stateName
+     *
+     * @return State
+     * @throws NotFoundStateException
+     */
+    private function findStateByNameSM($stateName)
+    {
+        $state = array_shift(array_filter(
+            $this->stateMachineAnnotationsSM->states,
+            function (State $state) use ($stateName) {
+                return $state->name === $stateName;
+            }
+        ));
+
+        if (is_null($state)) {
+            throw new NotFoundStateException("State not found. stateName: $stateName");
+        }
+
+        return $state;
+    }
+
+    /**
+     * @param $methodName
+     *
+     * @return mixed
+     */
+    private function executeEntityMethod($methodName)
+    {
+        if (!$methodName) {
+            return null;
+        }
+
+        return $this->$methodName();
     }
 }
