@@ -293,12 +293,13 @@ trait StateMachineTrait
      */
     private function findStateByNameSM($stateName)
     {
-        $state = array_shift(array_filter(
+        $state = array_filter(
             $this->stateMachineAnnotationsSM->states,
             function (State $state) use ($stateName) {
                 return $state->name === $stateName;
             }
-        ));
+        );
+        $state = array_shift($state);
 
         if (is_null($state)) {
             throw new NotFoundStateException("State not found. stateName: $stateName");
