@@ -2,9 +2,9 @@
 
 namespace StateMachine\Traits;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
+use StateMachine\Annotations\StateMachine;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Exceptions\NotFoundAnnotationException;
@@ -34,7 +34,7 @@ trait StateMachineTrait
     /**
      * Annotations for state machine.
      *
-     * @var null|Annotation[]
+     * @var null|StateMachine
      */
     private $stateMachineAnnotationsSM = null;
 
@@ -53,6 +53,7 @@ trait StateMachineTrait
         if (!array_key_exists($name, $this->methodsSM)) {
             trigger_error(sprintf('Call to undefined method: %s::%s().', get_class($this), $name), E_USER_ERROR);
         }
+
         $func = $this->methodsSM[$name];
 
         return call_user_func_array($func->bindTo($this, get_class($this)), $args);
