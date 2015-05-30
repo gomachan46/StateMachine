@@ -4,6 +4,9 @@ namespace StateMachine\Tests;
 
 use StateMachine\Tests\Entity\CallbackJob;
 
+/**
+ * Class CallbackTest
+ */
 class CallbackTest extends \PHPUnit_Framework_TestCase
 {
     /**

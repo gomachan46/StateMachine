@@ -46,6 +46,9 @@ class CallbackJob
      */
     private $status = 'sleeping';
 
+    /**
+     * @var bool
+     */
     private $runBeforeEnterRunning = false;
 
     /**
@@ -66,6 +69,9 @@ class CallbackJob
         return $this->runBeforeEnterRunning;
     }
 
+    /**
+     *
+     */
     private function beforeEnterRunning()
     {
         $this->runBeforeEnterRunning = true;

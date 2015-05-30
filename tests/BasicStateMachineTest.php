@@ -6,6 +6,9 @@ use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Tests\Entity\Job;
 
+/**
+ * Class BasicStateMachineTest
+ */
 class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  Job */
