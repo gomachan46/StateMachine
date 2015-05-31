@@ -165,6 +165,7 @@ trait StateMachineTrait
                 }
                 $toState = $this->findStateByNameSM($transition->to);
                 $this->executeEntityMethod($toState->beforeEnter);
+                $this->executeEntityMethod($toState->enter);
                 $this->setEntityStatusSM($transition->to);
 
                 return true;

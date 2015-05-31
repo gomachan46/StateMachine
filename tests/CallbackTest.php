@@ -16,6 +16,16 @@ class CallbackTest extends \PHPUnit_Framework_TestCase
     {
         $job = new CallbackJob();
         $job->run();
-        $this->assertTrue($job->isRunBeforeEnterRunning());
+        $this->assertTrue(in_array('beforeEnterRunning', $job->getRunCallbackMethods()));
+    }
+
+    /**
+     *
+     */
+    public function testRunEnterRunning()
+    {
+        $job = new CallbackJob();
+        $job->run();
+        $this->assertTrue(in_array('enterRunning', $job->getRunCallbackMethods()));
     }
 }

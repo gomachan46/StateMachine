@@ -17,4 +17,7 @@ class State extends Annotation
 
     /** @var  string */
     public $beforeEnter;
+
+    /** @var  string */
+    public $enter;
 }
