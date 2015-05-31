@@ -166,13 +166,13 @@ trait StateMachineTrait
                 $fromState = $this->findStateByNameSM($transition->from);
                 $toState = $this->findStateByNameSM($transition->to);
 
-                $this->executeEntityMethod($fromState->beforeExit);
-                $this->executeEntityMethod($fromState->exit);
-                $this->executeEntityMethod($toState->beforeEnter);
-                $this->executeEntityMethod($toState->enter);
+                $this->executeEntityMethodSM($fromState->beforeExit);
+                $this->executeEntityMethodSM($fromState->exit);
+                $this->executeEntityMethodSM($toState->beforeEnter);
+                $this->executeEntityMethodSM($toState->enter);
                 $this->setEntityStatusSM($transition->to);
-                $this->executeEntityMethod($fromState->afterExit);
-                $this->executeEntityMethod($toState->afterEnter);
+                $this->executeEntityMethodSM($fromState->afterExit);
+                $this->executeEntityMethodSM($toState->afterEnter);
 
                 return true;
             }
@@ -320,7 +320,7 @@ trait StateMachineTrait
      *
      * @return mixed
      */
-    private function executeEntityMethod($methodName)
+    private function executeEntityMethodSM($methodName)
     {
         if (!$methodName) {
             return null;
