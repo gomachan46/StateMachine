@@ -160,12 +160,13 @@ trait StateMachineTrait
          */
         $cb = function () use ($event) {
             $transitions = $event->transitions;
+            $this->executeEntityMethodSM($event->before);
             foreach ($transitions as $transition) {
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
                 $this->updateStateSM($transition);
-
+                $this->executeEntityMethodSM($event->after);
                 return true;
             }
             if ($this->stateMachineAnnotationsSM->whinyTransitions) {

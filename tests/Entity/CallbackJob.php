@@ -30,7 +30,9 @@ use StateMachine\Traits\StateMachineTrait;
  *             name="run",
  *             transitions={
  *                 @SM\Transition(from="sleeping", to="running")
- *             }
+ *             },
+ *             before="beforeRunEvent",
+ *             after="afterRunEvent"
  *         ),
  *         @SM\Event(
  *             name="clean",
@@ -125,5 +127,21 @@ class CallbackJob
     private function afterExitSleeping()
     {
         $this->runCallbackMethods[] = 'afterExitSleeping';
+    }
+
+    /**
+     *
+     */
+    private function beforeRunEvent()
+    {
+        $this->runCallbackMethods[] = 'beforeRunEvent';
+    }
+
+    /**
+     *
+     */
+    private function afterRunEvent()
+    {
+        $this->runCallbackMethods[] = 'afterRunEvent';
     }
 }
