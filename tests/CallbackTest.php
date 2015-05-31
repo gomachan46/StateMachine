@@ -10,32 +10,24 @@ use StateMachine\Tests\Entity\CallbackJob;
 class CallbackTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     *
+     * @dataProvider callbackMethods
      */
-    public function testRunBeforeEnterRunning()
+    public function testRunCallbackMethods($expected)
     {
         $job = new CallbackJob();
         $job->run();
-        $this->assertTrue(in_array('beforeEnterRunning', $job->getRunCallbackMethods()));
+        $this->assertTrue(in_array($expected, $job->getRunCallbackMethods()));
     }
 
     /**
-     *
+     * @return array
      */
-    public function testRunEnterRunning()
+    public function callbackMethods()
     {
-        $job = new CallbackJob();
-        $job->run();
-        $this->assertTrue(in_array('enterRunning', $job->getRunCallbackMethods()));
-    }
-
-    /**
-     *
-     */
-    public function testRunAfterEnterRunning()
-    {
-        $job = new CallbackJob();
-        $job->run();
-        $this->assertTrue(in_array('afterEnterRunning', $job->getRunCallbackMethods()));
+        return [
+            ['beforeEnterRunning'],
+            ['enterRunning'],
+            ['afterEnterRunning'],
+        ];
     }
 }
