@@ -17,4 +17,7 @@ class Transition extends Annotation
 
     /** @var  string */
     public $to;
+
+    /** @var  string */
+    public $after;
 }

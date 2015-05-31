@@ -33,6 +33,7 @@ class CallbackTest extends \PHPUnit_Framework_TestCase
             ['afterExitSleeping'],
             ['beforeRunEvent'],
             ['afterRunEvent'],
+            ['afterTransition']
         ];
     }
 }

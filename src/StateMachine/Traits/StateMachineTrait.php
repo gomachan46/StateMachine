@@ -300,6 +300,7 @@ trait StateMachineTrait
         $this->executeEntityMethodSM($toState->beforeEnter);
         $this->executeEntityMethodSM($toState->enter);
         $this->setEntityStatusSM($transition->to);
+        $this->executeEntityMethodSM($transition->after);
         $this->executeEntityMethodSM($fromState->afterExit);
         $this->executeEntityMethodSM($toState->afterEnter);
     }
