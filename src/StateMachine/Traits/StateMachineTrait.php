@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
 use StateMachine\Annotations\State;
 use StateMachine\Annotations\StateMachine;
+use StateMachine\Annotations\Transition;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Exceptions\NotFoundAnnotationException;
@@ -163,16 +164,7 @@ trait StateMachineTrait
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
-                $fromState = $this->findStateByNameSM($transition->from);
-                $toState = $this->findStateByNameSM($transition->to);
-
-                $this->executeEntityMethodSM($fromState->beforeExit);
-                $this->executeEntityMethodSM($fromState->exit);
-                $this->executeEntityMethodSM($toState->beforeEnter);
-                $this->executeEntityMethodSM($toState->enter);
-                $this->setEntityStatusSM($transition->to);
-                $this->executeEntityMethodSM($fromState->afterExit);
-                $this->executeEntityMethodSM($toState->afterEnter);
+                $this->updateStateSM($transition);
 
                 return true;
             }
@@ -290,6 +282,25 @@ trait StateMachineTrait
                 sprintf('Invalid "from" value. There must be an array or string. from: %s', $from)
             );
         }
+    }
+
+    /**
+     * @param Transition $transition
+     *
+     * @throws NotFoundStateException
+     */
+    private function updateStateSM(Transition $transition)
+    {
+        $fromState = $this->findStateByNameSM($transition->from);
+        $toState = $this->findStateByNameSM($transition->to);
+
+        $this->executeEntityMethodSM($fromState->beforeExit);
+        $this->executeEntityMethodSM($fromState->exit);
+        $this->executeEntityMethodSM($toState->beforeEnter);
+        $this->executeEntityMethodSM($toState->enter);
+        $this->setEntityStatusSM($transition->to);
+        $this->executeEntityMethodSM($fromState->afterExit);
+        $this->executeEntityMethodSM($toState->afterEnter);
     }
 
     /**
