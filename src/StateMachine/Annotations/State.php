@@ -16,10 +16,19 @@ class State extends Annotation
     public $name;
 
     /** @var  string */
+    public $beforeExit;
+
+    /** @var  string */
+    public $exit;
+
+    /** @var  string */
     public $beforeEnter;
 
     /** @var  string */
     public $enter;
+
+    /** @var  string */
+    public $afterExit;
 
     /** @var  string */
     public $afterEnter;

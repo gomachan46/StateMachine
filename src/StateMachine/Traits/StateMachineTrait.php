@@ -163,10 +163,15 @@ trait StateMachineTrait
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
+                $fromState = $this->findStateByNameSM($transition->from);
                 $toState = $this->findStateByNameSM($transition->to);
+
+                $this->executeEntityMethod($fromState->beforeExit);
+                $this->executeEntityMethod($fromState->exit);
                 $this->executeEntityMethod($toState->beforeEnter);
                 $this->executeEntityMethod($toState->enter);
                 $this->setEntityStatusSM($transition->to);
+                $this->executeEntityMethod($fromState->afterExit);
                 $this->executeEntityMethod($toState->afterEnter);
 
                 return true;

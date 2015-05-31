@@ -11,7 +11,12 @@ use StateMachine\Traits\StateMachineTrait;
  * @SM\StateMachine(
  *     property="status",
  *     states={
- *         @SM\State(name="sleeping"),
+ *         @SM\State(
+ *             name="sleeping",
+ *             beforeExit="beforeExitSleeping",
+ *             exit="exitSleeping",
+ *             afterExit="afterExitSleeping"
+ *         ),
  *         @SM\State(
  *             name="running",
  *             beforeEnter="beforeEnterRunning",
@@ -96,5 +101,29 @@ class CallbackJob
     private function afterEnterRunning()
     {
         $this->runCallbackMethods[] = 'afterEnterRunning';
+    }
+
+    /**
+     *
+     */
+    private function beforeExitSleeping()
+    {
+        $this->runCallbackMethods[] = 'beforeExitSleeping';
+    }
+
+    /**
+     *
+     */
+    private function exitSleeping()
+    {
+        $this->runCallbackMethods[] = 'exitSleeping';
+    }
+
+    /**
+     *
+     */
+    private function afterExitSleeping()
+    {
+        $this->runCallbackMethods[] = 'afterExitSleeping';
     }
 }
