@@ -159,14 +159,15 @@ trait StateMachineTrait
          * @throws InvalidTransitionException
          */
         $cb = function () use ($event) {
+            $args = func_get_args();
             $transitions = $event->transitions;
-            $this->executeEntityMethodSM($event->before);
+            $this->executeEntityMethodSM($event->before, $args);
             foreach ($transitions as $transition) {
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
-                $this->updateStateSM($transition);
-                $this->executeEntityMethodSM($event->after);
+                $this->updateStateSM($transition, $args);
+                $this->executeEntityMethodSM($event->after, $args);
                 return true;
             }
             if ($this->stateMachineAnnotationsSM->whinyTransitions) {
@@ -287,22 +288,23 @@ trait StateMachineTrait
 
     /**
      * @param Transition $transition
+     * @param array $args
      *
      * @throws NotFoundStateException
      */
-    private function updateStateSM(Transition $transition)
+    private function updateStateSM(Transition $transition, array $args = [])
     {
         $fromState = $this->findStateByNameSM($transition->from);
         $toState = $this->findStateByNameSM($transition->to);
 
-        $this->executeEntityMethodSM($fromState->beforeExit);
-        $this->executeEntityMethodSM($fromState->exit);
-        $this->executeEntityMethodSM($toState->beforeEnter);
-        $this->executeEntityMethodSM($toState->enter);
+        $this->executeEntityMethodSM($fromState->beforeExit, $args);
+        $this->executeEntityMethodSM($fromState->exit, $args);
+        $this->executeEntityMethodSM($toState->beforeEnter, $args);
+        $this->executeEntityMethodSM($toState->enter, $args);
         $this->setEntityStatusSM($transition->to);
-        $this->executeEntityMethodSM($transition->after);
-        $this->executeEntityMethodSM($fromState->afterExit);
-        $this->executeEntityMethodSM($toState->afterEnter);
+        $this->executeEntityMethodSM($transition->after, $args);
+        $this->executeEntityMethodSM($fromState->afterExit, $args);
+        $this->executeEntityMethodSM($toState->afterEnter, $args);
     }
 
     /**
@@ -330,15 +332,16 @@ trait StateMachineTrait
 
     /**
      * @param $methodName
+     * @param array $args
      *
      * @return mixed
      */
-    private function executeEntityMethodSM($methodName)
+    private function executeEntityMethodSM($methodName, array $args = [])
     {
         if (!$methodName) {
             return null;
         }
 
-        return $this->$methodName();
+        return call_user_func_array([$this, $methodName], $args); // $this->$methodName(...$args);
     }
 }
