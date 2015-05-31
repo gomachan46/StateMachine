@@ -12,7 +12,12 @@ use StateMachine\Traits\StateMachineTrait;
  *     property="status",
  *     states={
  *         @SM\State(name="sleeping"),
- *         @SM\State(name="running", beforeEnter="beforeEnterRunning", enter="enterRunning"),
+ *         @SM\State(
+ *             name="running",
+ *             beforeEnter="beforeEnterRunning",
+ *             enter="enterRunning",
+ *             afterEnter="afterEnterRunning"
+ *         ),
  *         @SM\State(name="cleaning")
  *     },
  *     events={
@@ -83,5 +88,13 @@ class CallbackJob
     private function enterRunning()
     {
         $this->runCallbackMethods[] = 'enterRunning';
+    }
+
+    /**
+     *
+     */
+    private function afterEnterRunning()
+    {
+        $this->runCallbackMethods[] = 'afterEnterRunning';
     }
 }

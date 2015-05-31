@@ -20,4 +20,7 @@ class State extends Annotation
 
     /** @var  string */
     public $enter;
+
+    /** @var  string */
+    public $afterEnter;
 }

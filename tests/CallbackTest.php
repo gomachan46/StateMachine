@@ -28,4 +28,14 @@ class CallbackTest extends \PHPUnit_Framework_TestCase
         $job->run();
         $this->assertTrue(in_array('enterRunning', $job->getRunCallbackMethods()));
     }
+
+    /**
+     *
+     */
+    public function testRunAfterEnterRunning()
+    {
+        $job = new CallbackJob();
+        $job->run();
+        $this->assertTrue(in_array('afterEnterRunning', $job->getRunCallbackMethods()));
+    }
 }
