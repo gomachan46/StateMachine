@@ -23,4 +23,7 @@ class StateMachine extends Annotation
 
     /** @var  boolean */
     public $whinyTransitions;
+
+    /** @var  boolean */
+    public $noDirectAssignment;
 }

@@ -244,6 +244,12 @@ trait StateMachineTrait
          * @throws NoDirectAssignmentException
          */
         $cb = function ($status) {
+            if ($this->stateMachineAnnotationsSM->noDirectAssignment === true) {
+                throw new NoDirectAssignmentException(
+                    'Can not assign direct because no direct assignment option enabled.'
+                );
+            }
+
             if ($this->getEntityStatusSM() === $status) {
                 // nothing to do
                 return $this;
