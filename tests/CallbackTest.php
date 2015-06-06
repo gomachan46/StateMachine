@@ -65,4 +65,32 @@ class CallbackTest extends \PHPUnit_Framework_TestCase
             ['afterTransition: arg1, arg2'],
         ];
     }
+
+    /**
+     * @dataProvider callbackMethodsAndOrder
+     */
+    public function testRunCallbackMethodsInTheCorrectOrder($index, $expected)
+    {
+        $job = new CallbackJob();
+        $job->run();
+        $this->assertSame($expected, $job->getRunCallbackMethods()[$index]);
+    }
+
+    /**
+     * @return array
+     */
+    public function callbackMethodsAndOrder()
+    {
+        return [
+            [0, 'beforeRunEvent'],
+            [1, 'beforeExitSleeping'],
+            [2, 'exitSleeping'],
+            [3, 'beforeEnterRunning'],
+            [4, 'enterRunning'],
+            [5, 'afterTransition'],
+            [6, 'afterExitSleeping'],
+            [7, 'afterEnterRunning'],
+            [8, 'afterRunEvent'],
+        ];
+    }
 }
