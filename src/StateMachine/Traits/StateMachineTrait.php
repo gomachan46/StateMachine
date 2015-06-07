@@ -4,6 +4,7 @@ namespace StateMachine\Traits;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
+use StateMachine\Annotations\Event;
 use StateMachine\Annotations\State;
 use StateMachine\Annotations\StateMachine;
 use StateMachine\Annotations\Transition;
@@ -146,10 +147,10 @@ trait StateMachineTrait
     }
 
     /**
-     * @param $event
+     * @param Event $event
      * @return bool
      */
-    private function addEventExecuteMethodSM($event)
+    private function addEventExecuteMethodSM(Event $event)
     {
         $methodName = Inflector::camelize($event->name);
 
@@ -183,9 +184,9 @@ trait StateMachineTrait
     }
 
     /**
-     * @param $event
+     * @param Event $event
      */
-    private function addEventCanExecuteMethodSM($event)
+    private function addEventCanExecuteMethodSM(Event $event)
     {
         $methodName = 'can' . ucfirst(Inflector::camelize($event->name));
 
@@ -210,9 +211,9 @@ trait StateMachineTrait
     }
 
     /**
-     * @param $state
+     * @param State $state
      */
-    private function addIsStateMethodSM($state)
+    private function addIsStateMethodSM(State $state)
     {
         $methodName = 'is' . ucfirst(Inflector::camelize($state->name));
 
@@ -228,9 +229,9 @@ trait StateMachineTrait
     }
 
     /**
-     * @param $state
+     * @param State $state
      */
-    private function addGetStateMethodSM($state)
+    private function addGetStateMethodSM(State $state)
     {
         $methodName = 'get' . ucfirst(Inflector::camelize($state->name));
 
