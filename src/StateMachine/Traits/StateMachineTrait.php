@@ -5,6 +5,7 @@ namespace StateMachine\Traits;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
 use StateMachine\Annotations\State;
+use StateMachine\Annotations\StateMachine;
 use StateMachine\Annotations\Transition;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
@@ -139,6 +140,7 @@ trait StateMachineTrait
         $states = $this->stateMachineAnnotationsSM->states;
         foreach ($states as $state) {
             $this->addIsStateMethodSM($state);
+            $this->addGetStateMethodSM($state);
         }
         $this->addSetStatusMethodSM();
     }
@@ -221,6 +223,28 @@ trait StateMachineTrait
          */
         $cb = function () use ($state) {
             return $this->getEntityStatusSM() === $state->name;
+        };
+        $this->methodsSM[$methodName] = $cb;
+    }
+
+    /**
+     * @param $state
+     */
+    private function addGetStateMethodSM($state)
+    {
+        $methodName = 'get' . ucfirst(Inflector::camelize($state->name));
+
+        /**
+         * @return bool
+         */
+        $cb = function () use ($state) {
+            $states = array_filter(
+                $this->stateMachineAnnotationsSM->states,
+                function (State $st) use ($state) {
+                    return $st->name === $state->name;
+                }
+            );
+            return array_shift($states);
         };
         $this->methodsSM[$methodName] = $cb;
     }
