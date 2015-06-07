@@ -5,7 +5,6 @@ namespace StateMachine\Traits;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
 use StateMachine\Annotations\State;
-use StateMachine\Annotations\StateMachine;
 use StateMachine\Annotations\Transition;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
@@ -118,7 +117,7 @@ trait StateMachineTrait
         $reader = new AnnotationReader();
         $this->stateMachineAnnotationsSM = $reader->getClassAnnotation(
             new \ReflectionClass($this),
-            StateMachine::class
+            'StateMachine\Annotations\StateMachine'
         );
         if (!$this->stateMachineAnnotationsSM) {
             throw new NotFoundAnnotationException('Not found @StateMachine annotation to class');
