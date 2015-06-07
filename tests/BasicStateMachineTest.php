@@ -6,6 +6,9 @@ use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Tests\Entity\Job;
 
+/**
+ * Class BasicStateMachineTest
+ */
 class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  Job */
@@ -41,6 +44,11 @@ class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('sleeping', $this->job->getStatus());
         $this->job->run();
         $this->assertSame('running', $this->job->getStatus());
+    }
+
+    public function testTransitionEventMethodReturnTrue()
+    {
+        $this->assertTrue($this->job->run());
     }
 
     /**
@@ -149,5 +157,28 @@ class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->fail();
+    }
+
+    /**
+     * @dataProvider stateNameAndGetter
+     *
+     * @param $expected
+     * @param $getter
+     */
+    public function testGetStateName($expected, $getter)
+    {
+        $this->assertSame($expected, $this->job->$getter());
+    }
+
+    /**
+     * @return array
+     */
+    public function stateNameAndGetter()
+    {
+        return [
+            ['sleeping', 'getSleeping'],
+            ['running', 'getRunning'],
+            ['cleaning', 'getCleaning'],
+        ];
     }
 }

@@ -18,4 +18,10 @@ class Event extends Annotation
 
     /** @var array<\StateMachine\Annotations\Transition> */
     public $transitions;
+
+    /** @var  string */
+    public $before;
+
+    /** @var  string */
+    public $after;
 }

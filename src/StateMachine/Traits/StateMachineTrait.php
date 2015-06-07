@@ -2,13 +2,16 @@
 
 namespace StateMachine\Traits;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Inflector\Inflector;
+use StateMachine\Annotations\Event;
+use StateMachine\Annotations\State;
 use StateMachine\Annotations\StateMachine;
+use StateMachine\Annotations\Transition;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Exceptions\NotFoundAnnotationException;
+use StateMachine\Exceptions\NotFoundStateException;
 
 /**
  * Trait StateMachineTrait
@@ -35,7 +38,7 @@ trait StateMachineTrait
     /**
      * Annotations for state machine.
      *
-     * @var null|Annotation[]
+     * @var null|StateMachine
      */
     private $stateMachineAnnotationsSM = null;
 
@@ -54,6 +57,7 @@ trait StateMachineTrait
         if (!array_key_exists($name, $this->methodsSM)) {
             trigger_error(sprintf('Call to undefined method: %s::%s().', get_class($this), $name), E_USER_ERROR);
         }
+
         $func = $this->methodsSM[$name];
 
         return call_user_func_array($func->bindTo($this, get_class($this)), $args);
@@ -137,14 +141,16 @@ trait StateMachineTrait
         $states = $this->stateMachineAnnotationsSM->states;
         foreach ($states as $state) {
             $this->addIsStateMethodSM($state);
+            $this->addGetStateNameMethodSM($state);
         }
         $this->addSetStatusMethodSM();
     }
 
     /**
-     * @param $event
+     * @param Event $event
+     * @return bool
      */
-    private function addEventExecuteMethodSM($event)
+    private function addEventExecuteMethodSM(Event $event)
     {
         $methodName = Inflector::camelize($event->name);
 
@@ -155,26 +161,32 @@ trait StateMachineTrait
          * @throws InvalidTransitionException
          */
         $cb = function () use ($event) {
+            $args = func_get_args();
             $transitions = $event->transitions;
+            $this->executeEntityMethodSM($event->before, $args);
             foreach ($transitions as $transition) {
                 if (!$this->canTransitionSM($transition->from)) {
                     continue;
                 }
-                $this->setEntityStatusSM($transition->to);
-
-                return;
+                $this->updateStateSM($transition, $args);
+                $this->executeEntityMethodSM($event->after, $args);
+                return true;
             }
-            throw new InvalidTransitionException(
-                sprintf('Invalid transition. event: %s, from: %s', $event->name, $this->getEntityStatusSM())
-            );
+            if ($this->stateMachineAnnotationsSM->whinyTransitions) {
+                return false;
+            } else {
+                throw new InvalidTransitionException(
+                    sprintf('Invalid transition. event: %s, from: %s', $event->name, $this->getEntityStatusSM())
+                );
+            }
         };
         $this->methodsSM[$methodName] = $cb;
     }
 
     /**
-     * @param $event
+     * @param Event $event
      */
-    private function addEventCanExecuteMethodSM($event)
+    private function addEventCanExecuteMethodSM(Event $event)
     {
         $methodName = 'can' . ucfirst(Inflector::camelize($event->name));
 
@@ -199,9 +211,9 @@ trait StateMachineTrait
     }
 
     /**
-     * @param $state
+     * @param State $state
      */
-    private function addIsStateMethodSM($state)
+    private function addIsStateMethodSM(State $state)
     {
         $methodName = 'is' . ucfirst(Inflector::camelize($state->name));
 
@@ -212,6 +224,22 @@ trait StateMachineTrait
          */
         $cb = function () use ($state) {
             return $this->getEntityStatusSM() === $state->name;
+        };
+        $this->methodsSM[$methodName] = $cb;
+    }
+
+    /**
+     * @param State $state
+     */
+    private function addGetStateNameMethodSM(State $state)
+    {
+        $methodName = 'get' . ucfirst(Inflector::camelize($state->name));
+
+        /**
+         * @return string
+         */
+        $cb = function () use ($state) {
+            return $this->findStateByNameSM($state->name)->name;
         };
         $this->methodsSM[$methodName] = $cb;
     }
@@ -234,6 +262,12 @@ trait StateMachineTrait
          * @throws NoDirectAssignmentException
          */
         $cb = function ($status) {
+            if ($this->stateMachineAnnotationsSM->noDirectAssignment === true) {
+                throw new NoDirectAssignmentException(
+                    'Can not assign direct because no direct assignment option enabled.'
+                );
+            }
+
             if ($this->getEntityStatusSM() === $status) {
                 // nothing to do
                 return $this;
@@ -274,5 +308,64 @@ trait StateMachineTrait
                 sprintf('Invalid "from" value. There must be an array or string. from: %s', $from)
             );
         }
+    }
+
+    /**
+     * @param Transition $transition
+     * @param array $args
+     *
+     * @throws NotFoundStateException
+     */
+    private function updateStateSM(Transition $transition, array $args = [])
+    {
+        $fromState = $this->findStateByNameSM($transition->from);
+        $toState = $this->findStateByNameSM($transition->to);
+
+        $this->executeEntityMethodSM($fromState->beforeExit, $args);
+        $this->executeEntityMethodSM($fromState->exit, $args);
+        $this->executeEntityMethodSM($toState->beforeEnter, $args);
+        $this->executeEntityMethodSM($toState->enter, $args);
+        $this->setEntityStatusSM($transition->to);
+        $this->executeEntityMethodSM($transition->after, $args);
+        $this->executeEntityMethodSM($fromState->afterExit, $args);
+        $this->executeEntityMethodSM($toState->afterEnter, $args);
+    }
+
+    /**
+     * @param $stateName
+     *
+     * @return State
+     * @throws NotFoundStateException
+     */
+    private function findStateByNameSM($stateName)
+    {
+        $state = array_filter(
+            $this->stateMachineAnnotationsSM->states,
+            function (State $state) use ($stateName) {
+                return $state->name === $stateName;
+            }
+        );
+        $state = array_shift($state);
+
+        if (is_null($state)) {
+            throw new NotFoundStateException("State not found. stateName: $stateName");
+        }
+
+        return $state;
+    }
+
+    /**
+     * @param $methodName
+     * @param array $args
+     *
+     * @return mixed
+     */
+    private function executeEntityMethodSM($methodName, array $args = [])
+    {
+        if (!$methodName) {
+            return null;
+        }
+
+        return call_user_func_array([$this, $methodName], $args); // $this->$methodName(...$args);
     }
 }

@@ -20,4 +20,10 @@ class StateMachine extends Annotation
 
     /** @var array<\StateMachine\Annotations\Event> */
     public $events;
+
+    /** @var  boolean */
+    public $whinyTransitions;
+
+    /** @var  boolean */
+    public $noDirectAssignment;
 }

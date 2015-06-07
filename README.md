@@ -234,9 +234,9 @@ class Job
   * to
     transition to ... (e.g. to="running")
 
-### Provides methods
+### Provides
 
-#### Basic methods
+#### Methods
 
 StateMachine provides some methods.
 
@@ -248,10 +248,30 @@ $job->run();
 $job->isRunning(); // true
 $job->isSleeping(); // false
 $job->canRun(); // false
+$job->getSleeping(); // 'sleeping'
+$job->getRunning(); // 'running'
+$job->getCleaning(); // 'cleaning'
 $job->run(); // raises StateMachine\Exceptions\InvalidTransitionException
 ```
 
-#### Direct assign method
+#### Whiny transition
+
+If you do not like exceptions and prefer a simple `true` or `false` as response, you can use `whinyTransitions` option.
+
+```php
+/**
+ * @SM\StateMachine(
+ *     ...,
+ *     whinyTransitions=true
+ * )
+ **/
+
+job.isRunning()  # => true
+job.canRun()  # => false
+job.run       # => false
+```
+
+#### Direct assignment
 
 StateMachine support direct assign.
 
@@ -263,13 +283,223 @@ $job->getStatus(); // 'running'
 $job->setStatus('sleeping'); // raises StateMachine\Exceptions\NoDirectAssignmentException
 ```
 
+##### No direct assignment option
+
+If you do not want to forgive direct assign, you can use `noDirectAssignment` option.
+
+```php
+/**
+ * @SM\StateMachine(
+ *     ...,
+ *     noDirectAssignment=true
+ * )
+ **/
+```
+
+Only this!
+
+```php
+$job = new Job();
+$job->getStatus(); // 'sleeping'
+$job->setStatus('running'); // raises StateMachine\Exceptions\NoDirectAssignmentException
+```
+
+#### Callbacks
+
+You can set callback method when ...
+
+* before event
+* before exit old state
+* exit old state
+* after transition
+* before enter new state
+* enter new state
+* update state
+* after exit old state
+* after enter new state
+* after event
+
+```php
+<?php
+
+namespace StateMachine\Tests\Entity;
+
+use StateMachine\Annotations as SM;
+use StateMachine\Traits\StateMachineTrait;
+
+/**
+ * CallbackJob
+ *
+ * @SM\StateMachine(
+ *     property="status",
+ *     states={
+ *         @SM\State(
+ *             name="sleeping",
+ *             beforeExit="beforeExitSleeping",
+ *             exit="exitSleeping",
+ *             afterExit="afterExitSleeping"
+ *         ),
+ *         @SM\State(
+ *             name="running",
+ *             beforeEnter="beforeEnterRunning",
+ *             enter="enterRunning",
+ *             afterEnter="afterEnterRunning"
+ *         ),
+ *         @SM\State(name="cleaning")
+ *     },
+ *     events={
+ *         @SM\Event(
+ *             name="run",
+ *             transitions={
+ *                 @SM\Transition(
+ *                     from="sleeping",
+ *                     to="running",
+ *                     after="afterTransition"
+ *                 )
+ *             },
+ *             before="beforeRunEvent",
+ *             after="afterRunEvent"
+ *         ),
+ *         @SM\Event(
+ *             name="clean",
+ *             transitions={
+ *                 @SM\Transition(from="running", to="cleaning")
+ *             }
+ *         ),
+ *         @SM\Event(
+ *             name="sleep",
+ *             transitions={
+ *                 @SM\Transition(from={"running", "cleaning"}, to="sleeping")
+ *             }
+ *         )
+ *     }
+ * )
+ */
+class CallbackJob
+{
+    use StateMachineTrait;
+
+    /**
+     * @var string
+     */
+    private $status = 'sleeping';
+
+    /**
+     *
+     */
+    private function beforeEnterRunning()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function enterRunning()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function afterEnterRunning()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function beforeExitSleeping()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function exitSleeping()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function afterExitSleeping()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function beforeRunEvent()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function afterRunEvent()
+    {
+        ...
+    }
+
+    /**
+     *
+     */
+    private function afterTransition()
+    {
+        ...
+    }
+}
+ ```
+ 
+ In this case,
+ 
+ ```php
+ $job = new CallbackJob();
+ $job->run();
+ 
+ /**
+  * run methods in this order.
+  *
+  * beforeRunEvent()
+  * beforeExitSleeping()
+  * exitSleeping()
+  * afterTransition()
+  * beforeEnterRunning()
+  * enterRunning()
+  * setStatus('running')
+  * afterExitSleeping()
+  * afterEnterRunning()
+  * afterRunEvent()
+  */
+ ```
+ 
+ You can run methods with args, too.
+ 
+ For example, 
+ 
+ ```php
+  public function beforeRunEvent()
+  {
+      $args = func_get_args();
+      echo join(', ', $args);
+  }
+ ```
+ 
+ ```php
+  $job->run('foo', 'bar'); // echo 'foo, bar';
+ ```
+
 ## In future
 
 In future, I am going to implement like AASM provides services:
 
-* whinyTransition option
-* NoDirectAssign option
-* Callbacks
 * Guards
 * Inspection
 * and more ...
