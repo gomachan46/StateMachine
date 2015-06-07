@@ -141,7 +141,7 @@ trait StateMachineTrait
         $states = $this->stateMachineAnnotationsSM->states;
         foreach ($states as $state) {
             $this->addIsStateMethodSM($state);
-            $this->addGetStateMethodSM($state);
+            $this->addGetStateNameMethodSM($state);
         }
         $this->addSetStatusMethodSM();
     }
@@ -231,21 +231,15 @@ trait StateMachineTrait
     /**
      * @param State $state
      */
-    private function addGetStateMethodSM(State $state)
+    private function addGetStateNameMethodSM(State $state)
     {
         $methodName = 'get' . ucfirst(Inflector::camelize($state->name));
 
         /**
-         * @return bool
+         * @return string
          */
         $cb = function () use ($state) {
-            $states = array_filter(
-                $this->stateMachineAnnotationsSM->states,
-                function (State $st) use ($state) {
-                    return $st->name === $state->name;
-                }
-            );
-            return array_shift($states);
+            return $this->findStateByNameSM($state->name)->name;
         };
         $this->methodsSM[$methodName] = $cb;
     }

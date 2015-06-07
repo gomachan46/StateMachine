@@ -2,7 +2,6 @@
 
 namespace StateMachine\Tests;
 
-use StateMachine\Annotations\State;
 use StateMachine\Exceptions\InvalidTransitionException;
 use StateMachine\Exceptions\NoDirectAssignmentException;
 use StateMachine\Tests\Entity\Job;
@@ -161,25 +160,25 @@ class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider stateName
+     * @dataProvider stateNameAndGetter
+     *
+     * @param $expected
+     * @param $getter
      */
-    public function testGetStateName($expected)
+    public function testGetStateName($expected, $getter)
     {
-        $getter = 'get'.ucfirst($expected);
-        /** @var State $state */
-        $state = $this->job->$getter();
-        $this->assertSame($expected, $state->name);
+        $this->assertSame($expected, $this->job->$getter());
     }
 
     /**
      * @return array
      */
-    public function stateName()
+    public function stateNameAndGetter()
     {
         return [
-            ['sleeping'],
-            ['running'],
-            ['cleaning'],
+            ['sleeping', 'getSleeping'],
+            ['running', 'getRunning'],
+            ['cleaning', 'getCleaning'],
         ];
     }
 }
