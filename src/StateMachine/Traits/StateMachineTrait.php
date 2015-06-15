@@ -318,7 +318,7 @@ trait StateMachineTrait
      */
     private function updateStateSM(Transition $transition, array $args = [])
     {
-        $fromState = $this->findStateByNameSM($transition->from);
+        $fromState = $this->findStateByNameSM($this->getEntityStatusSM());
         $toState = $this->findStateByNameSM($transition->to);
 
         $this->executeEntityMethodSM($fromState->beforeExit, $args);

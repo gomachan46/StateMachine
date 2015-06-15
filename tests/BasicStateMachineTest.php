@@ -39,11 +39,26 @@ class BasicStateMachineTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testValidTransitionEventMethod()
+    /**
+     * @dataProvider validTransition
+     */
+    public function testValidTransitionEventMethod(array $events, $expected)
     {
         $this->assertSame('sleeping', $this->job->getStatus());
-        $this->job->run();
-        $this->assertSame('running', $this->job->getStatus());
+        foreach ($events as $event) {
+            $this->job->$event();
+        }
+        $this->assertSame($expected, $this->job->getStatus());
+    }
+
+    public function validTransition()
+    {
+        return [
+            [['run'], 'running'],
+            [['run', 'clean'], 'cleaning'],
+            [['run', 'sleep'], 'sleeping'],
+            [['run', 'clean', 'sleep'], 'sleeping'],
+        ];
     }
 
     public function testTransitionEventMethodReturnTrue()
